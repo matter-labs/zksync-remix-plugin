@@ -1,0 +1,138 @@
+/* Card Css */
+
+.maincard {
+  display: grid;
+  grid-template-columns: 55% 45%;
+  background: var(--light);
+  border-radius: 6px;
+  white-space: nowrap;
+  align-items: center;
+}
+
+.tag-wrapper {
+  grid-area: a;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.txn-info-1 {
+  font-size: 14px;
+  align-content: center;
+  align-items: center;
+}
+
+.txn-info-2 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  align-content: center;
+  padding: 10px;
+  gap: 4px;
+  font-size: 10px;
+}
+
+.tag {
+  margin-top: 3px;
+}
+
+.account-wrapper {
+  grid-area: b;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  gap: 0.5rem;
+}
+
+.account-wrapper,
+.txn-wrapper {
+  padding: 0.5rem;
+}
+
+.account-wrapper p {
+  text-overflow: ellipsis;
+  margin: 0;
+  display: block;
+}
+
+.account-wrapper a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-wrapper a:hover {
+  cursor: pointer;
+}
+
+.txn-wrapper {
+  grid-area: c;
+  display: flex;
+  max-width: 100%;
+  overflow: hidden;
+  justify-content: space-between;
+}
+
+.txn-wrapper,
+.account-wrapper {
+  align-content: center;
+}
+
+.label-tx {
+  font-weight: bold;
+}
+
+.txn-wrapper p {
+  margin: 0;
+}
+
+.txn-wrapper a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+
+.txn-network {
+  grid-area: d;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.txn-network > p {
+  margin: 0;
+}
+
+/* Tag Css */
+
+.tag {
+  border: 1px solid;
+  border-radius: 0.5rem;
+  font-size: 0.5rem;
+  text-transform: uppercase;
+}
+
+.tag-declare {
+  border-color: var(--green);
+}
+
+.tag-invoke {
+  border-color: var(--indigo);
+}
+
+.tag-deploy {
+  border-color: var(--teal);
+}
+
+.tag-deployAccount {
+  border-color: var(--yellow);
+}
+
+.tag-localDevnet {
+  background: var(--bgPrimary);
+}
+
+.tag-remoteDevnet {
+  background: var(--bgPrimary);
+}

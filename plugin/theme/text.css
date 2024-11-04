@@ -1,0 +1,55 @@
+:root {
+
+    /* Texts */
+
+    .text-primary {
+        color: var(--primary) !important;
+    }
+
+    .text-secondary {
+        color: var(--secondary) !important;
+    }
+
+    .text-success {
+        color: var(--success) !important;
+    }
+
+    .text-information {
+        color: var(--info) !important;
+    }
+
+    .text-warning {
+        color: var(--warning) !important;
+    }
+
+    .text-error {
+        color: var(--error) !important;
+    }
+
+    .text-dark {
+        color: var(--text) !important;
+    }
+
+    .text-light {
+        color: var(--text) !important;
+    }
+
+    .text-disabled {
+        color: var(--text-bg-mark) !important;
+    }
+
+    /* Text Alignment */
+
+    .text-center {
+        text-align: center !important;
+    }
+
+    .text-start {
+        text-align: start !important;
+    }
+
+    .text-end {
+        text-align: end !important;
+    }
+
+}

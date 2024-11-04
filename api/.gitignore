@@ -1,0 +1,11 @@
+target
+casm
+sierra
+upload
+contracts
+
+.env
+
+sol/
+artifacts/
+logs/

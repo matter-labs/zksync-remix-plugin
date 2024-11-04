@@ -1,0 +1,99 @@
+{
+  "name": "zksync-remix-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@radix-ui/react-accordion": "^1.1.2",
+    "@radix-ui/react-dialog": "^1.0.4",
+    "@radix-ui/react-dropdown-menu": "^2.0.5",
+    "@radix-ui/react-tabs": "^1.0.4",
+    "@radix-ui/react-tooltip": "^1.0.6",
+    "@remixproject/engine": "^0.3.38",
+    "@remixproject/plugin": "^0.3.38",
+    "@remixproject/plugin-api": "^0.3.38",
+    "@remixproject/plugin-utils": "^0.3.38",
+    "@remixproject/plugin-webview": "^0.3.38",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/semver": "^7.5.6",
+    "@wagmi/core": "^1.4.13",
+    "@web3modal/wagmi": "^3.2.1",
+    "axios": "^1.4.0",
+    "bn.js": "^5.2.1",
+    "clsx": "^2.1.1",
+    "copy-to-clipboard": "^3.3.3",
+    "ethers": "^5.7.0",
+    "form-data": "^4.0.0",
+    "formik": "^2.4.2",
+    "jotai": "^2.2.2",
+    "nanoid": "^4.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.10.1",
+    "semver": "^7.5.4",
+    "viem": "^1.20.2",
+    "vite-plugin-checker": "^0.6.2",
+    "vite-plugin-svgr": "^4.0.0",
+    "wagmi": "^1.4.13",
+    "web-vitals": "^2.1.4",
+    "yup": "^1.2.0",
+    "zksync": "^0.13.1",
+    "zksync-ethers": "^5.0.0"
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.22.9",
+    "@types/bn.js": "^5.1.1",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.38",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^7.14.1",
+    "@vitejs/plugin-react": "^4.1.0",
+    "assemblyscript": "^0.27.5",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-standard-with-typescript": "^35.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.34.3",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "prettier": "^3.2.5",
+    "typescript": "^5.1.6",
+    "vite": "^4.4.9"
+  },
+  "scripts": {
+    "start": "vite --port 3000 -c ./vite.config.ts",
+    "build": "vite build",
+    "serve": "vite preview --port 3000",
+    "deploy": "pnpm run build; pnpm run serve",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\"",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx,js,jsx}\" --fix"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      "chrome >= 67",
+      "edge >= 79",
+      "firefox >= 68",
+      "opera >= 54",
+      "safari >= 14"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
