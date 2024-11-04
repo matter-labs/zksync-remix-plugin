@@ -14,6 +14,4 @@ if [ -z ${SERVICE_VERSION} ]; then
   exit 1
 fi
 
-grafana-agent-flow run ./configs/grafana-logs.config.river &
-
 cargo run --release
