@@ -1,11 +1,10 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN=true
 ENV HARDHAT_ENV_DOCKER_IMAGE="hardhat_env"
 ENV METRICS_PORT=8001
 
-RUN apt-get clean
 RUN apt-get update
 RUN apt-get install -y curl \
     git \
@@ -15,29 +14,17 @@ RUN apt-get install -y curl \
     apt-transport-https \
     software-properties-common \
     wget \
-    npm
+    npm \
+    && \
+    rm -rf /var/lib/apt/lists/*
 RUN wget https://github.com/ethereum/solidity/releases/download/v0.8.24/solc-static-linux -O /usr/local/bin/solc
-RUN chmod +x /usr/local/bin/solc
-
-RUN solc --version
-
-# Installing grafana agent
-RUN mkdir -p /etc/apt/keyrings/
-RUN wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | tee /etc/apt/keyrings/grafana.gpg > /dev/null
-RUN echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | tee -a /etc/apt/sources.list.d/grafana.list
-
-RUN apt-get update
-
-RUN apt-get install grafana-agent-flow
+RUN chmod +x /usr/local/bin/solc && solc --version
 
 RUN npm install -g yarn && npm install -g n
 RUN n lts
 
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable -y
 ENV PATH="/root/.cargo/bin:${PATH}"
-
-RUN whoami
-
 WORKDIR /opt/app
 COPY . /opt/app
 
