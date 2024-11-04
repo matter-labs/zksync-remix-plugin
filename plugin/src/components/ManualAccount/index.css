@@ -1,0 +1,21 @@
+.manual-root-wrapper {
+    width: 100%;
+    overflow: hidden;
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+
+    padding: 0;
+}
+
+.add-account-button-plus {
+    font-size: 25px;
+    padding: 0;
+    text-align: center;
+    display: flex;
+    align-items: center;
+}
+
+.add-account-button-plus:focus {
+    outline: none;
+}

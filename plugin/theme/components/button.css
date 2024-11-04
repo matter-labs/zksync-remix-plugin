@@ -1,0 +1,46 @@
+:root {
+  .btn-success {
+    color: var(--text);
+    background-color: var(--success);
+  }
+
+  .btn-success.disabled,
+  .btn-success.disabled:hover {
+    color: var(--text);
+    background-color: var(--success);
+  }
+
+  .btn-success:hover {
+    background-color: var(--success);
+  }
+
+  .btn-information {
+    color: var(--text);
+    background-color: var(--info);
+  }
+
+  .btn-information.disabled,
+  .btn-information.disabled:hover {
+    color: var(--text);
+    background-color: var(--info);
+  }
+
+  .btn-information:hover {
+    background-color: var(--info);
+  }
+
+  .btn-error {
+    color: var(--text);
+    background-color: var(--error);
+  }
+
+  .btn-error.disabled,
+  .btn-error.disabled:hover {
+    color: var(--text);
+    background-color: var(--error);
+  }
+
+  .btn-error:hover {
+    background-color: var(--error);
+  }
+}

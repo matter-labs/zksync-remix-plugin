@@ -1,0 +1,7 @@
+.environment-selector-wrapper {
+    width: 100%;
+}
+
+.devnet-trigger-wrapper {
+    border: 1px solid var(--secondary);
+}
