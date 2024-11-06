@@ -15,10 +15,8 @@ concurrency:
 
 jobs:
   build-deploy-ui:
-    name: Build and push Docker image
+    name: Build/Deploy frontend
     runs-on: ubuntu-latest
-    env:
-      CLOUDFLARE_API_TOKEN: ""
     steps:
       - uses: actions/checkout@v4
 
@@ -62,7 +60,6 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy ./plugin/build/ --project-name=zksync-remix-plugin --branch staging
-
 
       - name: Deploy production
         if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') }}
