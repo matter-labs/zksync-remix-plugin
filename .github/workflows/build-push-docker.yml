@@ -27,8 +27,9 @@ jobs:
       - name: Set Docker tag
         id: docker_tag
         run: |
+          ts=$(date +%s%N | cut -b1-13)
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "tag=${{ steps.git_sha.outputs.sha_short }}" >> $GITHUB_OUTPUT
+            echo "tag=${{ steps.git_sha.outputs.sha_short }}-${ts}" >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
             echo "tag=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_OUTPUT
           elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
