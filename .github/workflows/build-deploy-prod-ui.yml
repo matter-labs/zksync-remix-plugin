@@ -1,0 +1,45 @@
+name: Build and deploy UI
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20.x'
+  API_SERVICE_URL: "https://remix-plugin-api.zksync.io"
+  VITE_VERSION: v0.6.3
+  WALLETCONNECT_PROJECT_ID: ""
+jobs:
+  build-deploy-static:
+    name: Build and push Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
+
+      - name: Setup Node ${{ env.NODE_VERSION }} Environment
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm install -g pnpm
+
+      - name: pnpm install
+        working-directory: ./plugin
+        run: pnpm install
+
+      - name: pnpm build
+        working-directory: ./plugin
+        run: pnpm run build
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@05f17c4a695b4d94b57b59997562c6a4624c64e4 # v3.12.1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy ./plugin/build --project-name=zksync-remix-plugin-prod
