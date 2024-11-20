@@ -15,7 +15,7 @@ env:
   VITE_VERSION: v0.6.3
 jobs:
   build-deploy-static:
-    name: Build and push Docker image
+    name: Build and deploy UI
     runs-on: ubuntu-latest
     environment: prod
     steps:
