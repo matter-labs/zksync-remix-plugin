@@ -26,6 +26,9 @@ impl Fairing for CORS {
                 "POST, PATCH, GET, DELETE",
             ));
             response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
+            // Remove body to make sure that the response is empty
+            // otherwise the response can not be treated as a valid preflight response.
+            response.set_sized_body(0, std::io::Cursor::new(Vec::new()));
         }
 
         // Take the Plugin App URL from the env variable, if set
