@@ -13,11 +13,11 @@ env:
   NODE_VERSION: '20.x'
   API_SERVICE_URL: "https://remix-plugin-api.zksync.io"
   VITE_VERSION: v0.6.3
-  WALLETCONNECT_PROJECT_ID: ""
 jobs:
   build-deploy-static:
-    name: Build and push Docker image
+    name: Build and deploy UI
     runs-on: ubuntu-latest
+    environment: prod
     steps:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
 
@@ -35,6 +35,8 @@ jobs:
 
       - name: pnpm build
         working-directory: ./plugin
+        env:
+          WALLETCONNECT_PROJECT_ID: ${{ secrets.WALLETCONNECT_PROJECT_ID }}
         run: pnpm run build
 
       - name: Deploy
