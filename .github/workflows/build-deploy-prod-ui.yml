@@ -11,6 +11,9 @@ concurrency:
 
 env:
   NODE_VERSION: '20.x'
+  API_SERVICE_URL: "https://remix-plugin-api.zksync.io"
+  VITE_VERSION: v0.6.3
+  WALLETCONNECT_PROJECT_ID: ""
 jobs:
   build-deploy-static:
     name: Build and push Docker image
