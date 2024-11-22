@@ -112,7 +112,7 @@ async fn main() -> Result<(), CoreError> {
     let (shutdown_sender, mut shutdown_receiver) = watch::channel(());
     let app = create_app();
 
-    const DEFAULT_PORT: u16 = 3312;
+    const DEFAULT_PORT: u16 = 8001;
     let metrics_port = match env::var("PROMETHEUS_PORT") {
         Ok(v) => v.parse::<u16>().unwrap_or(DEFAULT_PORT),
         Err(_) => DEFAULT_PORT,
