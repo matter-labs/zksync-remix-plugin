@@ -1,121 +1,76 @@
-use prometheus::core::{AtomicF64, AtomicU64, GenericCounter, GenericCounterVec, GenericGaugeVec};
-use prometheus::{Encoder, GaugeVec, IntCounter, IntCounterVec, Opts, Registry, TextEncoder};
-use rocket::fairing::{Fairing, Info, Kind};
-use rocket::http::Method;
-use rocket::{Data, Request, State};
-use tracing::debug;
-use tracing::instrument;
+use std::{
+    fmt,
+    time::{Duration, Instant},
+};
+use vise::*;
 
-use crate::errors::CoreError;
-
-const NAMESPACE: &str = "zksync_api";
-
-#[derive(Clone, Debug)]
-pub struct Metrics {
-    pub num_distinct_users: GenericCounterVec<AtomicU64>,
-    pub num_plugin_launches: GenericCounter<AtomicU64>,
-    pub num_of_compilations: GenericCounter<AtomicU64>,
-    pub requests_total: GenericCounter<AtomicU64>,
-    pub action_failures_total: GenericCounterVec<AtomicU64>,
-    pub action_successes_total: GenericCounterVec<AtomicU64>,
-    pub action_duration_seconds: GenericGaugeVec<AtomicF64>,
+#[derive(Debug)]
+pub(crate) struct MethodLatency {
+    method: Method,
+    started_at: Instant,
 }
 
-#[rocket::async_trait]
-impl Fairing for Metrics {
-    fn info(&self) -> Info {
-        Info {
-            name: "Metrics fairing",
-            kind: Kind::Request,
-        }
-    }
-
-    #[instrument(skip(self, req, _data))]
-    async fn on_request(&self, req: &mut Request<'_>, _data: &mut Data<'_>) {
-        self.requests_total.inc();
-        if let Some(val) = req.client_ip() {
-            let ip = val.to_string();
-            let ip = ip.as_str();
-            debug!("Plugin launched by: {}", ip);
-            debug!("Headers: {:?}", req.headers());
-
-            self.num_distinct_users.with_label_values(&[ip]).inc();
-        }
-
-        match req.method() {
-            Method::Options => {}
-            _ => self.update_metrics(req),
+impl MethodLatency {
+    pub fn new(method: &'static str) -> Self {
+        Self {
+            method: Method(method),
+            started_at: Instant::now(),
         }
     }
 }
 
-impl Metrics {
-    fn update_metrics(&self, req: &mut Request<'_>) {
-        match req.uri().path().as_str() {
-            "/compile" | "/compile-async" => self.num_of_compilations.inc(),
-            "/on-plugin-launched" => self.num_plugin_launches.inc(),
-            _ => {}
+impl Drop for MethodLatency {
+    fn drop(&mut self) {
+        METRICS.latencies[&self.method].observe(self.started_at.elapsed());
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct CompileLatency {
+    started_at: Instant,
+}
+
+impl Default for CompileLatency {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl CompileLatency {
+    pub fn new() -> Self {
+        Self {
+            started_at: Instant::now(),
         }
     }
 }
 
-pub(crate) fn create_metrics(registry: Registry) -> Result<Metrics, CoreError> {
-    const ACTION_LABEL_NAME: &str = "action";
-
-    let opts = Opts::new("num_distinct_users", "Number of distinct users").namespace(NAMESPACE);
-    let num_distinct_users = IntCounterVec::new(opts, &["ip"])?;
-    registry.register(Box::new(num_distinct_users.clone()))?;
-
-    let opts = Opts::new("num_plugin_launches", "Number of plugin launches").namespace(NAMESPACE);
-    let num_plugin_launches = IntCounter::with_opts(opts)?;
-    registry.register(Box::new(num_plugin_launches.clone()))?;
-
-    let opts = Opts::new("num_of_compilations", "Number of compilation runs").namespace(NAMESPACE);
-    let num_of_compilations = IntCounter::with_opts(opts)?;
-    registry.register(Box::new(num_of_compilations.clone()))?;
-
-    // Follow naming conventions for new metrics https://prometheus.io/docs/practices/naming/
-    let opts = Opts::new("requests_total", "Number of requests").namespace(NAMESPACE);
-    let requests_total = IntCounter::with_opts(opts)?;
-    registry.register(Box::new(requests_total.clone()))?;
-
-    let opts = Opts::new("action_failures_total", "Number of action failures").namespace(NAMESPACE);
-    let action_failures_total = IntCounterVec::new(opts, &[ACTION_LABEL_NAME])?;
-    registry.register(Box::new(action_failures_total.clone()))?;
-
-    let opts =
-        Opts::new("action_successes_total", "Number of action successes").namespace(NAMESPACE);
-    let action_successes_total = IntCounterVec::new(opts, &[ACTION_LABEL_NAME])?;
-    registry.register(Box::new(action_successes_total.clone()))?;
-
-    let opts =
-        Opts::new("action_duration_seconds", "Duration of action in seconds").namespace(NAMESPACE);
-    let action_duration_seconds = GaugeVec::new(opts, &[ACTION_LABEL_NAME])?;
-    registry.register(Box::new(action_duration_seconds.clone()))?;
-
-    Ok(Metrics {
-        num_distinct_users,
-        num_plugin_launches,
-        num_of_compilations,
-        requests_total,
-        action_failures_total,
-        action_successes_total,
-        action_duration_seconds,
-    })
-}
-
-#[instrument(skip(registry))]
-#[get("/metrics")]
-pub(crate) async fn metrics(registry: &State<Registry>) -> String {
-    let metric_families = registry.gather();
-    let mut buffer = Vec::new();
-    let encoder = TextEncoder::new();
-
-    match encoder.encode(&metric_families, &mut buffer) {
-        Ok(_) => match String::from_utf8(buffer) {
-            Ok(val) => val,
-            Err(_) => "Non utf8 metrics".into(),
-        },
-        Err(_) => "Encode error".into(),
+impl Drop for CompileLatency {
+    fn drop(&mut self) {
+        METRICS.compile_latency.observe(self.started_at.elapsed());
     }
 }
+
+#[derive(Debug, Clone, Metrics)]
+#[metrics(prefix = "remix_plugin")]
+pub(crate) struct Metrics {
+    /// Latency for API methods.
+    #[metrics(buckets = Buckets::LATENCIES)]
+    pub latencies: Family<Method, Histogram<Duration>>,
+    /// Latency for compilation.
+    #[metrics(buckets = Buckets::LATENCIES)]
+    pub compile_latency: Histogram<Duration>,
+}
+
+/// API method name
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EncodeLabelSet, EncodeLabelValue)]
+#[metrics(label = "method")]
+pub(crate) struct Method(pub &'static str);
+
+impl fmt::Display for Method {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(formatter, "{}", self.0)
+    }
+}
+
+#[vise::register]
+pub(crate) static METRICS: Global<Metrics> = Global::new();

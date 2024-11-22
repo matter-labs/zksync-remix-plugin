@@ -4,7 +4,7 @@ use crate::handlers::types::{
     ApiCommand, ApiCommandResult, CompilationRequest, CompileResponse, CompiledFile,
 };
 use crate::handlers::SPAWN_SEMAPHORE;
-use crate::metrics::Metrics;
+use crate::metrics::{CompileLatency, MethodLatency};
 use crate::rate_limiter::RateLimited;
 use crate::utils::cleaner::AutoCleanUp;
 use crate::utils::hardhat_config::HardhatConfigBuilder;
@@ -21,26 +21,26 @@ use std::process::Stdio;
 use tracing::instrument;
 use tracing::{error, info};
 
-pub(crate) const COMPILATION_LABEL_VALUE: &str = "compilation";
-
-#[instrument(skip(request_json, _rate_limited, engine))]
+#[instrument(skip(request_json, _rate_limited))]
 #[post("/compile", format = "json", data = "<request_json>")]
 pub async fn compile(
     request_json: Json<CompilationRequest>,
     _rate_limited: RateLimited,
-    engine: &State<WorkerEngine>,
 ) -> Json<CompileResponse> {
+    let _guard = MethodLatency::new("/compile");
     info!("/compile/{:?}", request_json.config);
 
-    do_compile(request_json.0, &engine.metrics, false)
-        .await
-        .unwrap_or_else(|e| {
+    match do_compile(request_json.0).await {
+        Ok(response) => response,
+        Err(e) => {
+            error!("Failed to compile: {:?}", e);
             Json(CompileResponse {
                 file_content: vec![],
                 message: e.to_string(),
                 status: "Error".to_string(),
             })
-        })
+        }
+    }
 }
 
 #[instrument(skip(request_json, _rate_limited, engine))]
@@ -50,6 +50,7 @@ pub async fn compile_async(
     _rate_limited: RateLimited,
     engine: &State<WorkerEngine>,
 ) -> String {
+    let _guard = MethodLatency::new("/compile-async");
     info!("/compile-async/{:?}", request_json.config);
 
     do_process_command(ApiCommand::Compile(request_json.0), engine)
@@ -58,6 +59,7 @@ pub async fn compile_async(
 #[instrument(skip(engine))]
 #[get("/compile-result/<process_id>")]
 pub async fn get_compile_result(process_id: String, engine: &State<WorkerEngine>) -> String {
+    let _guard = MethodLatency::new("/compile-result");
     info!("/compile-result/{:?}", process_id);
 
     fetch_process_result(process_id, engine, |result| match result {
@@ -68,11 +70,8 @@ pub async fn get_compile_result(process_id: String, engine: &State<WorkerEngine>
     })
 }
 
-pub async fn do_compile(
-    compilation_request: CompilationRequest,
-    metrics: &Metrics,
-    is_health_check: bool,
-) -> Result<Json<CompileResponse>> {
+pub async fn do_compile(compilation_request: CompilationRequest) -> Result<Json<CompileResponse>> {
+    let _guard = CompileLatency::new();
     let zksolc_version = compilation_request.config.version;
 
     // check if the version is supported
@@ -172,13 +171,6 @@ pub async fn do_compile(
             String::from_utf8_lossy(&output.stderr)
         );
 
-        if !is_health_check {
-            metrics
-                .action_failures_total
-                .with_label_values(&[COMPILATION_LABEL_VALUE])
-                .inc();
-        }
-
         return Ok(Json(CompileResponse {
             file_content: vec![],
             message: format!(
@@ -214,13 +206,6 @@ pub async fn do_compile(
 
     // calling here explicitly to avoid dropping the AutoCleanUp struct
     auto_clean_up.clean_up().await;
-
-    if !is_health_check {
-        metrics
-            .action_successes_total
-            .with_label_values(&[COMPILATION_LABEL_VALUE])
-            .inc();
-    }
 
     Ok(Json(CompileResponse {
         file_content: file_contents,

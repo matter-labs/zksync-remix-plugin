@@ -1,5 +1,5 @@
 use crate::errors::{ApiError, Result};
-use crate::handlers::types::{CompilationConfig, CompilationRequest, CompiledFile};
+use crate::handlers::types::CompiledFile;
 use rocket::tokio;
 use rocket::tokio::fs;
 use solang_parser::diagnostics::{Diagnostic, ErrorType, Level};
@@ -192,21 +192,6 @@ pub fn list_files_in_directory<P: AsRef<Path>>(path: P) -> Vec<String> {
     }
 
     file_paths
-}
-
-pub fn generate_mock_compile_request() -> CompilationRequest {
-    CompilationRequest {
-        config: CompilationConfig {
-            version: "1.4.1".to_string(),
-            user_libraries: vec![],
-        },
-        contracts: vec![CompiledFile {
-            file_name: "SimpleStorage.sol".to_string(),
-            file_content: generate_mock_solidity_file_content(),
-            is_contract: false,
-        }],
-        target_path: None,
-    }
 }
 
 pub fn generate_mock_solidity_file_content() -> String {

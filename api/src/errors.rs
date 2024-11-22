@@ -53,7 +53,7 @@ pub enum CoreError {
     #[error(transparent)]
     RocketError(#[from] rocket::Error),
     #[error(transparent)]
-    PrometheusError(#[from] prometheus::Error),
+    TokioError(#[from] tokio::task::JoinError),
     #[error(transparent)]
     LoggingGlobalError(#[from] tracing::dispatcher::SetGlobalDefaultError),
 }
