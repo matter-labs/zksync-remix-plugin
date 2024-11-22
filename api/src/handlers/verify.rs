@@ -9,7 +9,7 @@ use crate::errors::{ApiError, Result};
 use crate::handlers::process::{do_process_command, fetch_process_result};
 use crate::handlers::types::{ApiCommand, ApiCommandResult, VerificationRequest, VerifyResponse};
 use crate::handlers::SPAWN_SEMAPHORE;
-use crate::metrics::Metrics;
+use crate::metrics::MethodLatency;
 use crate::rate_limiter::RateLimited;
 use crate::utils::cleaner::AutoCleanUp;
 use crate::utils::hardhat_config::HardhatConfigBuilder;
@@ -19,18 +19,16 @@ use crate::utils::lib::{
 };
 use crate::worker::WorkerEngine;
 
-pub(crate) const VERIFICATION_LABEL_VALUE: &str = "compilation";
-
-#[instrument(skip(verification_request_json, _rate_limited, engine))]
+#[instrument(skip(verification_request_json, _rate_limited))]
 #[post("/verify", format = "json", data = "<verification_request_json>")]
 pub async fn verify(
     verification_request_json: Json<VerificationRequest>,
     _rate_limited: RateLimited,
-    engine: &State<WorkerEngine>,
 ) -> Json<VerifyResponse> {
+    let _guard = MethodLatency::new("/verify");
     info!("/verify/{:?}", verification_request_json.config);
 
-    do_verify(verification_request_json.0, &engine.metrics)
+    do_verify(verification_request_json.0)
         .await
         .unwrap_or_else(|e| {
             Json(VerifyResponse {
@@ -47,6 +45,7 @@ pub fn verify_async(
     _rate_limited: RateLimited,
     engine: &State<WorkerEngine>,
 ) -> String {
+    let _guard = MethodLatency::new("/verify-async");
     info!("/verify-async/{:?}", verification_request_json.config);
 
     do_process_command(ApiCommand::Verify(verification_request_json.0), engine)
@@ -55,6 +54,7 @@ pub fn verify_async(
 #[instrument(skip(engine))]
 #[get("/verify-result/<process_id>")]
 pub async fn get_verify_result(process_id: String, engine: &State<WorkerEngine>) -> String {
+    let _guard = MethodLatency::new("/verify-result");
     info!("/verify-result/{:?}", process_id);
 
     fetch_process_result(process_id, engine, |result| match result {
@@ -84,10 +84,7 @@ fn extract_verify_args(request: &VerificationRequest) -> Vec<String> {
     args
 }
 
-pub async fn do_verify(
-    verification_request: VerificationRequest,
-    metrics: &Metrics,
-) -> Result<Json<VerifyResponse>> {
+pub async fn do_verify(verification_request: VerificationRequest) -> Result<Json<VerifyResponse>> {
     let zksolc_version = verification_request.config.zksolc_version.clone();
 
     // check if the version is supported
@@ -178,21 +175,11 @@ pub async fn do_verify(
     auto_clean_up.clean_up().await;
 
     if !status.success() {
-        metrics
-            .action_failures_total
-            .with_label_values(&[VERIFICATION_LABEL_VALUE])
-            .inc();
-
         return Ok(Json(VerifyResponse {
             status: "Error".to_string(),
             message: String::from_utf8_lossy(&output.stderr).to_string(),
         }));
     }
-
-    metrics
-        .action_successes_total
-        .with_label_values(&[VERIFICATION_LABEL_VALUE])
-        .inc();
 
     Ok(Json(VerifyResponse {
         status: "Success".to_string(),

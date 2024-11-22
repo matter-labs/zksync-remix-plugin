@@ -1,4 +1,5 @@
 use crate::handlers::types::{ApiCommand, ApiCommandResult};
+use crate::metrics::MethodLatency;
 use crate::worker::{ProcessState, WorkerEngine};
 use rocket::State;
 use tracing::{info, instrument};
@@ -7,6 +8,7 @@ use uuid::Uuid;
 #[instrument(skip(engine))]
 #[get("/process_status/<process_id>")]
 pub async fn get_process_status(process_id: String, engine: &State<WorkerEngine>) -> String {
+    let _guard = MethodLatency::new("/process_status");
     info!("/process_status/{:?}", process_id);
     // get status of process by ID
     match Uuid::parse_str(&process_id) {

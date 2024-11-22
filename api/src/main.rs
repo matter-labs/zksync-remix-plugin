@@ -17,17 +17,17 @@ use handlers::process::get_process_status;
 use handlers::utils::service_version;
 use handlers::verify::{get_verify_result, verify, verify_async};
 use handlers::{health, who_is_this};
-use prometheus::Registry;
 use rocket::tokio::time::sleep;
-use rocket::{tokio, Build, Config, Rocket};
+use rocket::{tokio, Build, Rocket};
 use std::env;
-use std::net::Ipv4Addr;
+use std::time::Duration;
+use tokio::sync::watch;
 use tracing::info;
+use vise_exporter::MetricsExporter;
 
 use crate::cors::CORS;
 use crate::errors::CoreError;
 use crate::handlers::utils::on_plugin_launched;
-use crate::metrics::{create_metrics, Metrics};
 use crate::rate_limiter::RateLimiter;
 use crate::tracing_log::init_logger;
 use crate::utils::lib::{ARTIFACTS_ROOT, SOL_ROOT};
@@ -41,7 +41,7 @@ async fn clear_artifacts() {
     info!("artifacts cleared!");
 }
 
-fn create_app(metrics: Metrics) -> Rocket<Build> {
+fn create_app() -> Rocket<Build> {
     const DEFAULT_NUM_OF_WORKERS: u32 = 2u32;
     const DEFAULT_QUEUE_SIZE: usize = 1_000;
 
@@ -56,7 +56,7 @@ fn create_app(metrics: Metrics) -> Rocket<Build> {
     };
 
     // Launch the worker processes
-    let mut engine = WorkerEngine::new(number_of_workers, queue_size, metrics.clone());
+    let mut engine = WorkerEngine::new(number_of_workers, queue_size);
     engine.start();
 
     // Create a new scheduler
@@ -84,7 +84,6 @@ fn create_app(metrics: Metrics) -> Rocket<Build> {
     rocket::build()
         .manage(engine)
         .manage(RateLimiter::new())
-        .attach(metrics)
         .attach(CORS)
         .mount(
             "/",
@@ -106,37 +105,39 @@ fn create_app(metrics: Metrics) -> Rocket<Build> {
         )
 }
 
-fn create_metrics_server(registry: Registry) -> Rocket<Build> {
-    const DEFAULT_PORT: u16 = 8001;
-    let port = match env::var("METRICS_PORT") {
-        Ok(val) => val.parse::<u16>().unwrap_or(DEFAULT_PORT),
-        Err(_) => DEFAULT_PORT,
-    };
-
-    let config = Config {
-        port,
-        address: Ipv4Addr::UNSPECIFIED.into(),
-        ..Config::default()
-    };
-
-    rocket::custom(config)
-        .manage(registry)
-        .mount("/", routes![metrics::metrics])
-}
-
 #[rocket::main]
 async fn main() -> Result<(), CoreError> {
     init_logger()?;
 
-    let registry = Registry::new();
-    let metrics = create_metrics(registry.clone())?;
+    let (shutdown_sender, mut shutdown_receiver) = watch::channel(());
+    let app = create_app();
 
-    let app = create_app(metrics);
-    let metrics_server = create_metrics_server(registry);
+    const DEFAULT_PORT: u16 = 8001;
+    let metrics_port = match env::var("PROMETHEUS_PORT") {
+        Ok(v) => v.parse::<u16>().unwrap_or(DEFAULT_PORT),
+        Err(_) => DEFAULT_PORT,
+    };
+    tracing::info!("Launching prometheus exporter on port: {metrics_port}");
+    let exporter = MetricsExporter::default().with_graceful_shutdown(async move {
+        shutdown_receiver.changed().await.ok();
+    });
+    let bind_address = format!("0.0.0.0:{metrics_port}").parse().unwrap();
 
-    let (app_result, metrics_result) = rocket::tokio::join!(app.launch(), metrics_server.launch());
-    app_result?;
-    metrics_result?;
+    let app_future = app.launch();
+    let metrics_future = tokio::spawn(exporter.start(bind_address));
 
+    tokio::select! {
+        res = app_future => {
+            info!("Rocket webserver has been shut down");
+            shutdown_sender.send(()).unwrap();
+            res.map(drop)?;
+        }
+        res = metrics_future => {
+            info!("Prometheus exporter has been shut down");
+            let _ = res?;
+        }
+    }
+    shutdown_sender.send(()).unwrap();
+    tokio::time::sleep(Duration::from_secs(1)).await;
     Ok(())
 }

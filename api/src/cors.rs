@@ -16,10 +16,7 @@ impl Fairing for CORS {
     }
 
     async fn on_response<'r>(&self, request: &'r Request<'_>, response: &mut Response<'r>) {
-        tracing::info!("on_response handler for request: {request:?}");
-        tracing::info!("original planned response: {response:?}");
         if request.method() == Method::Options {
-            tracing::info!("request method is OPTIONS");
             response.set_status(Status::NoContent);
             response.set_header(Header::new(
                 "Access-Control-Allow-Methods",
@@ -45,6 +42,5 @@ impl Fairing for CORS {
         }
 
         response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
-        tracing::info!("response after setting headers: {response:?}");
     }
 }
