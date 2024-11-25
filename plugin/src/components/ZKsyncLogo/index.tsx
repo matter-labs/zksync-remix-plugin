@@ -24,17 +24,17 @@ const sizeToDimenstions = (
   return { h: baseH, w: baseW }
 }
 
-interface INethermind {
+interface IZKsyncLogo {
   size?: 'lg' | 'sm' | 'xl' | 'xs' | 'md'
 }
 
-const Nethermind: React.FC<INethermind> = ({ size = 'xs' }): React.ReactElement => {
+const ZKsyncLogo: React.FC<IZKsyncLogo> = ({ size = 'xs' }): React.ReactElement => {
   const sz = sizeToDimenstions(size)
   return (
-    <a href={'https://nethermind.io'} target={'_blank'} rel="noreferrer">
-      <img width={sz.w} height={sz.h} src={useIcon('nethermind-logo.svg')}></img>
+    <a href={'https://zksync.io'} target={'_blank'} rel="noreferrer">
+      <img width={sz.w} height={sz.h} src={useIcon('zksync-logo.svg')}></img>
     </a>
   )
 }
 
-export default Nethermind
+export default ZKsyncLogo
