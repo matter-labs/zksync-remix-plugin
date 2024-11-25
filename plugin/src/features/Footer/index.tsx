@@ -16,7 +16,7 @@ export const Footer = () => {
         </label>
       </div>
       <div className="version-right">
-        <label className="nethermind-powered">
+        <label className="zksync-powered">
           <span>Powered by: </span>
           <ZKsyncLogo size="xs" />
         </label>
