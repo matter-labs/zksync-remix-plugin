@@ -1,4 +1,4 @@
-git clone git@github.com:NethermindEth/zksync-remix-plugin.git
+git clone git@github.com:matter-labs/zksync-remix-plugin.git
 
 cd zksync-remix-plugin/plugin
 

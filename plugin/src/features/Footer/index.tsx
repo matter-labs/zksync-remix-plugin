@@ -1,6 +1,6 @@
 import React from 'react'
 import { useAtomValue } from 'jotai'
-import Nethermind from '@/components/NM'
+import ZKsyncLogo from '@/components/ZKsyncLogo'
 import { solidityVersionAtom } from '@/atoms'
 import './style.css'
 
@@ -16,9 +16,9 @@ export const Footer = () => {
         </label>
       </div>
       <div className="version-right">
-        <label className="nethermind-powered">
+        <label className="zksync-powered">
           <span>Powered by: </span>
-          <Nethermind size="xs" />
+          <ZKsyncLogo size="xs" />
         </label>
       </div>
     </div>

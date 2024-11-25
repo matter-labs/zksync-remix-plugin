@@ -51,9 +51,11 @@ export const FILES_NOT_IN_CONTRACTS_MESSAGE =
   'Warning: Only files within the /contracts/* folder structure are included in the project compilation. The following smart contracts defined outside this structure will not be available for deployment:'
 
 export const PLUGIN_INFO_CONTENT_ARRAY = [
-    'The zkSync Remix Plugin is in Alpha',
-    'Solidity contracts are compiled on a server hosted by Nethermind'
-  ]
+  'The zkSync Remix Plugin is in Alpha',
+  'Solidity contracts are compiled on a server hosted by Matter Labs',
+  'Remote Devnet is a shared environment. It may be reset at any time and different users may try to submit transactions from the same account, causing issues with nonces',
+  'It is recommended to use local devnet to avoid these issues'
+]
 
 export { devnetUrl, networks, networkExplorerUrls, licenses }
 
