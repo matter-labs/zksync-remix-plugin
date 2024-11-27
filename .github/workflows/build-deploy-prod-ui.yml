@@ -9,7 +9,6 @@ concurrency:
 env:
   NODE_VERSION: '20.x'
   API_SERVICE_URL: "https://remix-plugin-api.zksync.io"
-  VITE_VERSION: v0.6.3
   VITE_REMOTE_DEVNET_URL: "https://era-test-node.zksync.io"
 jobs:
   build-deploy-static:
