@@ -11,17 +11,17 @@ ignore = []
 
 [licenses]
 allow = [
-    "MIT",
-    "Apache-2.0",
-    "Unlicense",
-    "Unicode-DFS-2016",
-    "CC0-1.0",
-    "BSD-2-Clause",
-    "BSD-3-Clause",
-    "Zlib",
-    "Apache-2.0 WITH LLVM-exception",
-    "0BSD",
-    "BSL-1.0",
+  "MIT",
+  "Apache-2.0",
+  "Unlicense",
+  "Unicode-DFS-2016",
+  "CC0-1.0",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "Zlib",
+  "Apache-2.0 WITH LLVM-exception",
+  "0BSD",
+  "BSL-1.0",
 ]
 confidence-threshold = 0.8
 
