@@ -5,8 +5,8 @@ ENV DEBCONF_NONINTERACTIVE_SEEN=true
 ENV HARDHAT_ENV_DOCKER_IMAGE="hardhat_env"
 ENV METRICS_PORT=8001
 
-RUN apt-get update
-RUN apt-get install -y curl \
+RUN apt-get update && \
+    apt-get install -y curl \
     git \
     cmake \
     build-essential \
