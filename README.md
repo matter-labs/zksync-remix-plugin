@@ -64,8 +64,11 @@ cd api
 cd hardhat_env
 yarn
 cd ..
-VITE_URL=http://localhost:3000 SERVICE_VERSION="v0.1.1" cargo run
+VITE_URL=http://localhost:3000 cargo run
 ```
+
+*Note:* By default, the crate version will be used to represent the version of the backend. It's possible to override it
+via `SERVICE_VERSION` environment variable, but it's not recommended.
 
 #### Plugin
 
@@ -81,13 +84,16 @@ pnpm install;
 Firstly, you need to define ENV variables for the server:
 
 - VITE_URL=http://localhost:3000 - the address of the UI
-- SERVICE_VERSION="v0.0.1" - the version of the back-end (should be less than version of UI)
 
 And ENV variables for the plugin:
 
 - API_SERVICE_URL="http://127.0.0.1:8000" - the address of the API
 - WALLETCONNECT_PROJECT_ID=<your_walletconnect_project_id> - the project id for WalletConnect
 - ZKSYNC_DEVNET_URL="https://zksync-devnet.nethermind.dev" - the address of the ZKsync devnet
+
+
+*Note:* By default, the package version will be used to represent the version of the plugin. It's possible to override it
+via `VITE_VERSION` environment variable, but it's not recommended.
 
 You need to be running both the server and the plugin in order to have a working environment.
 
@@ -110,7 +116,7 @@ cd api
 cd hardhat_env
 yarn
 cd ..
-VITE_URL=http://localhost:3000 SERVICE_VERSION="v0.1.1" cargo run
+VITE_URL=http://localhost:3000 cargo run
 ```
 
 or alternatively, you can run the server in watch mode (with `cargo watch`):
