@@ -18,7 +18,7 @@
     "@matterlabs/zksync-contracts": "^0.6.1",
     "@openzeppelin/contracts": "^5.2.0",
     "@openzeppelin/contracts-upgradeable": "^4.6.0",
-    "@chainlink/contracts": "^1.5.0",
+    "@chainlink/contracts": "^1.3.0",
     "@thirdweb-dev/contracts": "^3.11.2"
   }
 }
