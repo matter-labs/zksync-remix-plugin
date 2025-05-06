@@ -35,7 +35,7 @@ pub const ALLOWED_NETWORKS: [&str; 2] = ["sepolia", "mainnet"];
 pub const TEMP_DIR: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/", "temp/");
 
 pub fn get_file_ext(file_path: &str) -> String {
-    match file_path.split('.').last() {
+    match file_path.split('.').next_back() {
         Some(ext) => ext.to_string(),
         None => {
             debug!("LOG: File extension not found");
