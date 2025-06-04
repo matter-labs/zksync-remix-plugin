@@ -106,6 +106,7 @@ fn create_app() -> Rocket<Build> {
 }
 
 #[rocket::main]
+#[allow(clippy::result_large_err)]  
 async fn main() -> Result<(), CoreError> {
     init_logger()?;
 
