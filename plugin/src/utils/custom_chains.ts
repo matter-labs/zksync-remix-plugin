@@ -22,28 +22,6 @@ export const ZKcandyMainnet = defineChain({
     network: ''
 })
 
-export const ZKcandySepoliaTestnet = defineChain({
-    id: 302,
-    name: 'ZKcandy Sepolia Testnet',
-    nativeCurrency: {
-        decimals: 18,
-        name: 'Ether',
-        symbol: 'ETH',
-    },
-    rpcUrls: {
-        default: {
-            http: ['https://sepolia.rpc.zkcandy.io/'],
-        },
-        public: {
-            http: ['https://sepolia.rpc.zkcandy.io/'],
-        }
-    },
-    blockExplorers: {
-        default: {name: 'Explorer', url: 'https://sepolia.explorer.zkcandy.io/'},
-    },
-    network: ''
-})
-
 export const zkLinkNova = defineChain({
     id: 810180,
     name: 'zkLink Nova',
