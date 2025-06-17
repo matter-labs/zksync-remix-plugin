@@ -11,12 +11,12 @@ import { zkSync, zkSyncSepoliaTestnet } from 'viem/chains'
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import { EIP6963Connector, walletConnectProvider } from '@web3modal/wagmi'
-import { sophonTestnet, zkCandySepoliaTestnet, zkLinkNova, zkLinkNovaTestnet } from './utils/custom_chains'
+import { sophonTestnet, ZKcandyMainnet, zkLinkNova, zkLinkNovaTestnet } from './utils/custom_chains'
 
 const projectId: string = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID // TODO who owns this? make sure matter labs owns this
 
 const zkSyncChains = [zkSyncSepoliaTestnet, zkSync]
-const supportedChains = [zkCandySepoliaTestnet, zkLinkNova, zkLinkNovaTestnet, sophonTestnet]
+const supportedChains = [ZKcandyMainnet, zkLinkNova, zkLinkNovaTestnet, sophonTestnet]
 
 const chains = [...zkSyncChains, ...supportedChains]
 

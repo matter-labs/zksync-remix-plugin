@@ -100,6 +100,7 @@ pub fn filter_layer(level: LogLevel) -> EnvFilter {
     EnvFilter::try_new(filter_str).expect("filter string must parse")
 }
 
+#[allow(clippy::result_large_err)]
 pub fn init_logger() -> Result<(), CoreError> {
     // Log all `tracing` events to files prefixed with `debug`.
     // Rolling these files every day

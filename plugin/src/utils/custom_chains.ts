@@ -1,8 +1,8 @@
 import {defineChain} from 'viem'
 
-export const zkCandySepoliaTestnet = defineChain({
-    id: 302,
-    name: 'zkCandy Sepolia Testnet',
+export const ZKcandyMainnet = defineChain({
+    id: 320,
+    name: 'ZKcandy Mainnet',
     nativeCurrency: {
         decimals: 18,
         name: 'Ether',
@@ -10,14 +10,14 @@ export const zkCandySepoliaTestnet = defineChain({
     },
     rpcUrls: {
         default: {
-            http: ['https://sepolia.rpc.zkcandy.io/'],
+            http: ['https://rpc.zkcandy.io/'],
         },
         public: {
-            http: ['https://sepolia.rpc.zkcandy.io/'],
+            http: ['https://rpc.zkcandy.io/'],
         }
     },
     blockExplorers: {
-        default: {name: 'Explorer', url: 'https://sepolia.explorer.zkcandy.io/'},
+        default: {name: 'Explorer', url: 'https://explorer.zkcandy.io/'},
     },
     network: ''
 })
