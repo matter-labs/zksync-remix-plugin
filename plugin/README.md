@@ -1,4 +1,4 @@
-## Instalation
+## Installation
 
 ```bash
 pnpm install
