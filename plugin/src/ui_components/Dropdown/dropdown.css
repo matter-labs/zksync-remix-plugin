@@ -3,6 +3,11 @@ button {
   all: unset;
 }
 
+[data-radix-popper-content-wrapper] {
+  z-index: 9999;
+  background-color: inherit;
+}
+
 .DropdownMenuContent,
 .DropdownMenuSubContent {
   width: var(--radix-dropdown-menu-trigger-width);
