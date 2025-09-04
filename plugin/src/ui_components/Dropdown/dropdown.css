@@ -10,7 +10,6 @@ button {
 
 .DropdownMenuContent,
 .DropdownMenuSubContent {
-  position: static !important;
   width: var(--radix-dropdown-menu-trigger-width);
   border: 1px solid var(--secondary);
   border-radius: 6px;
