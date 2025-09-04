@@ -112,7 +112,7 @@
   }
 
   .AccordionContent {
-    position: fixed;
+    position: relative;
 
     z-index: 10;
 
